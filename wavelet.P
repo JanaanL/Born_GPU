@@ -1,0 +1,5 @@
+n1=128
+d1=.01
+wavelet=ricker1
+fhi=40
+tdelay=.045
