@@ -15,7 +15,7 @@ public:
    \dat data
  */
 tmute(float t, float v, std::shared_ptr<oc_float> mod, std::shared_ptr<oc_float> dat){
-	set_domain(mod.get()); set_range(dat.get());
+	set_domain(mod); set_range(dat);
 	t_0=t; vmute=v;
 };
 
@@ -24,13 +24,13 @@ tmute(float t, float v, std::shared_ptr<oc_float> mod, std::shared_ptr<oc_float>
    \param model model
    \param data data
  */
-virtual bool forward(bool add, my_vector *model, my_vector *data);
+virtual bool forward(bool add,std::shared_ptr<my_vector> model, std::shared_ptr<my_vector>data);
 /**adjoint function
    \param bool add to current model
    \param model model
    \param data data
  */
-virtual bool adjoint(bool add, my_vector *model, my_vector *data);
+virtual bool adjoint(bool add, std::shared_ptr<my_vector>model,std::shared_ptr<my_vector>data);
 
 /** t0 for mute*/
 float t_0;

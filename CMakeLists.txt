@@ -29,6 +29,11 @@ install(PROGRAMS ${PROJECT_BINARY_DIR}/Sep_cube
 )
 
 add_subdirectory(base)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
+
+ADD_EXECUTABLE(RTM3D main.cc)
+TARGET_LINK_LIBRARIES(RTM3D base genericCpp)
 #add_subdirectory(gui)
 
 

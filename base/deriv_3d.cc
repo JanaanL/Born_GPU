@@ -1,9 +1,10 @@
 #include "deriv_3d.h"
 #include "float_3d.h"
 
-bool deriv::adjoint(bool add, my_vector *model, my_vector *data,int iter){
-	float_3d *d=(float_3d*) data;
-	float_3d *m=(float_3d*) model;
+bool deriv::adjoint(bool add, std::shared_ptr<my_vector>model, std::shared_ptr<my_vector>data,int iter){
+
+	std::shared_ptr<float_3d> m= std::dynamic_pointer_cast<float_3d>( model);
+	std::shared_ptr<float_3d> d= std::dynamic_pointer_cast<float_3d>( data);
 	if(!add) m->zero();
 
 	SEP::axis a1=d->getAxis(1);
@@ -22,9 +23,9 @@ bool deriv::adjoint(bool add, my_vector *model, my_vector *data,int iter){
 
 }
 
-bool deriv::forward(bool add, my_vector *model, my_vector *data,int iter){
-	hypercube_float *d=(float_3d*) data;
-	hypercube_float *m=(float_3d*) model;
+bool deriv::forward(bool add, std::shared_ptr<my_vector> model, std::shared_ptr<my_vector>data,int iter){
+	std::shared_ptr<float_3d> m= std::dynamic_pointer_cast<float_3d>( model);
+	std::shared_ptr<float_3d> d= std::dynamic_pointer_cast<float_3d>( data);
 
 	SEP::axis a1=d->getAxis(1);
 	SEP::axis a2=d->getAxis(2);

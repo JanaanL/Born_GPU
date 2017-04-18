@@ -33,11 +33,32 @@ oc_float::oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,std::share
 	_file->writeDescription();
 	name="oc_float";
 }
+oc_float::oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,std::shared_ptr<oc_float> fle){
+
+	_io=io;
+
+	temp=false;
+	_file=io->getRegFile(tag,SEP::usageInOut);
+	_file->setHyper(fle->_file->getHyper());
+	_file->writeDescription();
+	name="oc_float";
+}
 oc_float::oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag){
 	_io=io;
 	_file= io->getRegFile(tag,SEP::usageIn);
 	name="oc_float";
 	temp=false;
+
+}
+void oc_float::initNewFile(std::string tag, std::shared_ptr<SEP::genericIO> io,
+	std::shared_ptr<SEP::hypercube> hyper, const SEP::usage_code usage){
+
+
+	_io=io;
+	_tag=tag;
+	_file=_io->getRegFile(tag,usage);
+	_file->setHyper(hyper);
+	_file->writeDescription();
 
 }
 void oc_float::scale(double r){
@@ -65,7 +86,7 @@ void oc_float::deallocate(){
 
 
 }
-oc_float *oc_float::clone(bool alloc, std::string tag){
+std::shared_ptr<oc_float> oc_float::clone(bool alloc, std::string tag){
 	int ndims=this->getHyper()->getNdim();
 
 	std::vector<SEP::axis> axes;
@@ -75,12 +96,11 @@ oc_float *oc_float::clone(bool alloc, std::string tag){
 
 	if(tag=="NONE") val=make_temp();
 	else val=tag;
-	oc_float *tmp=new oc_float(_io,val,this->getHyper());
-
+	std::shared_ptr<oc_float> tmp;
 	if(alloc) {
-		tmp->allocate();
-		tmp->add(this);
+		tmp=this->clone(true,val);
 	}
+	else tmp=this->clone(false,val);
 	return tmp;
 }
 void oc_float::set_val(double val){
@@ -152,12 +172,12 @@ void oc_float::info(char *str,int level){
 }
 std::shared_ptr<my_vector>oc_float::clone_vec(){
 	//std::shared_ptr<my_vector>m=(my_vector*) this->clone();
-	oc_float *m=this->clone();
-	return (my_vector*)m;
+	std::shared_ptr<oc_float> m=this->clone();
+	return m;
 }
 std::shared_ptr<my_vector>oc_float::clone_space(){
-	oc_float *m=this->clone(false);
-	return (my_vector*)m;
+	std::shared_ptr<oc_float> m=this->clone(false);
+	return m;
 }
 void oc_float::random(){
 
@@ -179,8 +199,7 @@ void oc_float::random(){
 double oc_float::dot(std::shared_ptr<my_vector>other){
 	double ret=0;
 	check_same(other);
-	oc_float *o=(oc_float*) other;
-
+	std::shared_ptr<oc_float> o = std::dynamic_pointer_cast<oc_float>( other);
 	long long ndo=_file->getHyper()->getN123();
 	long long nbuf=1000*1000;
 	float *buf1=new float[nbuf];
@@ -206,7 +225,7 @@ double oc_float::dot(std::shared_ptr<my_vector>other){
 void oc_float::mult(std::shared_ptr<my_vector>other){
 
 	check_same(other);
-	oc_float *o=(oc_float*) other;
+	std::shared_ptr<oc_float> o = std::dynamic_pointer_cast<oc_float>( other);
 
 	long long ndo=_file->getHyper()->getN123();
 	long long nbuf=1000*1000;
@@ -235,8 +254,8 @@ void oc_float::scale_add(double sc1, std::shared_ptr<my_vector>v1, double sc2, s
 
 	check_same(v1);
 	check_same(v2);
-	oc_float *o1=(oc_float*) v1;
-	oc_float *o2=(oc_float*) v2;
+	std::shared_ptr<oc_float> o1 = std::dynamic_pointer_cast<oc_float>( v1);
+	std::shared_ptr<oc_float> o2 = std::dynamic_pointer_cast<oc_float>( v2);
 
 	long long ndo=_file->getHyper()->getN123();
 	long long nbuf=1000*1000;
@@ -324,7 +343,8 @@ double oc_float::my_max(){
 void oc_float::scale_add(const double sc1, std::shared_ptr<my_vector>other, const double sc2){
 
 	check_same(other);
-	oc_float *o1=(oc_float*) other;
+	std::shared_ptr<oc_float> o1 = std::dynamic_pointer_cast<oc_float>( other);
+
 
 	long long ndo=_file->getHyper()->getN123();
 	long long nbuf=1000*1000;
@@ -356,7 +376,7 @@ bool oc_float::check_match(const std::shared_ptr<my_vector>v2){
 		fprintf(stderr,"vector not oc_float");
 		return false;
 	}
-	oc_float *h2=(oc_float*) v2;
+	std::shared_ptr<oc_float> h2 = std::dynamic_pointer_cast<oc_float>( v2);
 
 	if(_file->getHyper()->getNdim()!=h2->_file->getHyper()->getN123()) {
 		fprintf(stderr,"vectors not the same number of dimensions\n");

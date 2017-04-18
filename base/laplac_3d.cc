@@ -1,7 +1,7 @@
 #include "laplac_3d.h"
 #include "float_3d.h"
 
-bool laplac::adjoint(bool add, std : shared_ptr< my_vector >model, std : shared_ptr< my_vector >data,int iter){
+bool laplac::adjoint(bool add, std::shared_ptr< my_vector >model, std::shared_ptr< my_vector >data,int iter){
 	std::shared_ptr<hypercube_float> d = std::dynamic_pointer_cast<hypercube_float>( data);
 	std::shared_ptr<hypercube_float> m = std::dynamic_pointer_cast<hypercube_float>( model);
 	if(!add) m->zero();
@@ -43,7 +43,7 @@ bool laplac::adjoint(bool add, std : shared_ptr< my_vector >model, std : shared_
 
 }
 
-bool laplac::forward(bool add, std : shared_ptr< my_vector >model, std : shared_ptr< my_vector >data,int iter){
+bool laplac::forward(bool add, std::shared_ptr< my_vector >model, std::shared_ptr< my_vector >data,int iter){
 	std::shared_ptr<hypercube_float> d = std::dynamic_pointer_cast<hypercube_float>( data);
 	std::shared_ptr<hypercube_float> m = std::dynamic_pointer_cast<hypercube_float>( model);
 

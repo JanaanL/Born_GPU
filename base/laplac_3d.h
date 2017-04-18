@@ -11,8 +11,8 @@ laplac(std::shared_ptr<hypercube_float>mod, std::shared_ptr<hypercube_float >dat
 
 ~laplac(){
 };
-virtual bool forward(bool add,std : shared_ptr< my_vector >model, std : shared_ptr< my_vector >data,int iter=0);
-virtual bool adjoint(bool add, std : shared_ptr< my_vector >model, std : shared_ptr< my_vector >data,int iter=0);
+virtual bool forward(bool add,std::shared_ptr< my_vector >model, std ::shared_ptr< my_vector >data,int iter=0);
+virtual bool adjoint(bool add, std::shared_ptr< my_vector >model, std::shared_ptr< my_vector >data,int iter=0);
 
 
 

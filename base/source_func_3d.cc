@@ -6,7 +6,8 @@
 
 
 
-void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom, float ap,int nbt, int nb, int nby, int fat, int blocksize){
+void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom,
+	float ap,int nbt, int nb, int nby, int fat, int blocksize){
 	ax=dom->getAxis(1);
 	ay=dom->getAxis(2);
 	az=dom->getAxis(3);
@@ -16,7 +17,7 @@ void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom, float ap
 
 	ay.n+=2*nbound_y;
 	ax.n+=2*nbound;
-	az.n+=2*nbound;                                                                                                                                                //nbt+nb+2*fat;
+	az.n+=2*nbound;                                                                                                                                                            //nbt+nb+2*fat;
 	//az.n+=nbt+nb+2;//*fat;
 
 	int rem_x=ax.n-((int) (ax.n/16))*16;
@@ -68,7 +69,8 @@ std::shared_ptr<hypercube_float> source_func::create_domain(int ishot){
 	return tmp;
 }
 
-void wavelet_source_func::get_source_func(std::shared_ptr<hypercube_float> domain, int ishot, int nts, int *locs, float *time){
+void wavelet_source_func::get_source_func(std::shared_ptr<hypercube_float> domain,
+	int ishot, int nts, std::vector<int>locs, std::vector<float> time){
 	SEP::axis a1=domain->getAxis(1);
 	SEP::axis a2=domain->getAxis(2);
 	SEP::axis a3=domain->getAxis(3);

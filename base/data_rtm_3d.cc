@@ -1,127 +1,127 @@
 #include "data_rtm_3d.h"
 #include <math.h>
 
-data_rtm_3d::data_rtm_3d(char *tg,param_func *par){
+data_rtm_3d::data_rtm_3d(std::string tg, std::shared_ptr<SEP::genericIO> io){
 
-  // Here we set up the data vectors, relevant axes and set to zero
+	// Here we set up the data vectors, relevant axes and set to zero
 
-  tag_init(tg);
+	_io=io;
 
-  axis a=get_axis(1);
-  max_time=a.o+a.d*(a.n-1);
-  max_time=max_time;
-  dt=a.d;
-  nt=a.n;
-  rec_locs=0; data=0;
-  dsamp=dt;
+	tagInit(tg);
 
-  sz=par->get_float("rec_depth",0.);
- fprintf(stderr,"sz is %f \n",sz);
+	SEP::axis a=getAxis(1);
+	max_time=a.o+a.d*(a.n-1);
+	max_time=max_time;
+	dt=a.d;
+	nt=a.n;
+	rec_locs=0; data=0;
+	dsamp=dt;
+
+	sz=io->getParamObj()->getFloat("rec_depth",0.);
+	fprintf(stderr,"sz is %f \n",sz);
 
 }
 
 int data_rtm_3d::get_points(){
-  // Simply get the surface grid size
-  return get_axis(2).n*get_axis(3).n;
+	// Simply get the surface grid size
+	return getAxis(2).n*getAxis(3).n;
 }
 
 int data_rtm_3d::get_points1(){
-  // Return x axis length
-  return get_axis(2).n;
+	// Return x axis length
+	return getAxis(2).n;
 }
 
 int data_rtm_3d::get_points2(){
-  // Return y axis length
-  return get_axis(3).n;
+	// Return y axis length
+	return getAxis(3).n;
 }
 
-void data_rtm_3d::add_data(int ishot, hypercube_float *dat){
+void data_rtm_3d::add_data(int ishot, std::shared_ptr<hypercube_float> dat){
 
-  int n1=get_axis(1).n;
- int  n2=get_axis(2).n;
-  int n3=get_axis(3).n;
-  sseek_block(myf->tagit.c_str(),get_axis(2).n*ishot*get_axis(3).n,get_axis(1).n*4,0);
-  hypercube_float *tmp=(hypercube_float*)dat->clone_zero();
-  for(long long i3=0; i3 < get_axis(3).n; i3++)
-    sreed(myf->tagit.c_str(),tmp->vals+i3*n1*n2,n1*n2*4);
+	int n1=getAxis(1).n;
+	int n2=getAxis(2).n;
+	int n3=getAxis(3).n;
+	_file->seekTo((long long)(getAxis(2).n*ishot*getAxis(3).n)*(long long)(getAxis(1).n*4),0);
 
-  for(long long i=0; i <  tmp->get_n123(); i++) tmp->vals[i]+=dat->vals[i];
+	std::shared_ptr<hypercube_float> tmp=dat->clone(); tmp->scale(0.);
+	for(long long i3=0; i3 < getAxis(3).n; i3++)
+		_file->readFloatStream(tmp->vals+i3*n1*n2,n1*n2);
 
-  sseek_block(myf->tagit.c_str(),get_axis(2).n*ishot*get_axis(3).n,get_axis(1).n*4,0);
-  for(long long i3=0; i3 < get_axis(3).n; i3++)
-    srite(myf->tagit.c_str(),tmp->vals+i3*n1*n2,n1*n2*4);
+	for(long long i=0; i <  tmp->getN123(); i++) tmp->vals[i]+=dat->vals[i];
 
-  delete tmp;
+	_file->seekTo((long long)(getAxis(2).n*ishot*getAxis(3).n)*(long long)(getAxis(1).n*4),0);
+	for(long long i3=0; i3 < getAxis(3).n; i3++)
+		_file->writeFloatStream(tmp->vals+i3*n1*n2,n1*n2);
 
 }
 
-void data_rtm_3d::get_source_func(hypercube_float *domain, int ishot, float *s_x, float *s_y, float *s_z, int nsinc,  int nts,hypercube_float *time){
+void data_rtm_3d::get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,
+	std::vector<float>s_x, std::vector<float>s_y, std::vector<float>s_z, int nsinc,
+	int nts,std::shared_ptr<hypercube_float> time){
 
-  // Read the data and set up the source geometry
+	// Read the data and set up the source geometry
 
-  axis a1=domain->get_axis(1);
-  axis a2=domain->get_axis(2);
-  axis a3=domain->get_axis(3);
-  axis at=get_axis(1);
+	SEP::axis a1=domain->getAxis(1);
+	SEP::axis a2=domain->getAxis(2);
+	SEP::axis a3=domain->getAxis(3);
+	SEP::axis at=getAxis(1);
 
-  // Seek to shot position and read
-  sseek_block(myf->tagit.c_str(),get_axis(3).n*get_axis(2).n*ishot,get_axis(1).n*4,0);
-  sreed(myf->tagit.c_str(),time->vals,get_axis(1).n*get_axis(2).n*get_axis(3).n*4);
+	// Seek to shot position and read
+	_file->seekTo((long long)(getAxis(3).n*getAxis(2).n)*(long long)(getAxis(1).n*4),0);
+	_file->readFloatStream(time->vals,getAxis(1).n*getAxis(2).n*getAxis(3).n);
 
-  int i=0;
+	int i=0;
 
-  // Set up the regular source geometry
-  for(int i3=0; i3< (get_axis(3).n); i3++){
-    for(int i2=0; i2< get_axis(2).n; i2++, i++){
-      s_z[i]=(sz-a3.o)/a3.d;
-      s_x[i]=(get_axis(2).o+get_axis(2).d*i2-a1.o)/a1.d;
-      s_y[i]=(get_axis(3).o+get_axis(3).d*i3-a2.o)/a2.d;
-    }
-  }
-  fprintf(stderr,"first receiver depth is %f \n",s_z[0]);
-  sseek(myf->tagit.c_str(),0,0);
+	// Set up the regular source geometry
+	for(int i3=0; i3< (getAxis(3).n); i3++) {
+		for(int i2=0; i2< getAxis(2).n; i2++, i++) {
+			s_z[i]=(sz-a3.o)/a3.d;
+			s_x[i]=(getAxis(2).o+getAxis(2).d*i2-a1.o)/a1.d;
+			s_y[i]=(getAxis(3).o+getAxis(3).d*i3-a2.o)/a2.d;
+		}
+	}
+	_file->seekTo(0,0);
 }
 
 /*void data_rtm_3d::get_source_func_encode(hypercube_float *domain, int ishot, bool encode, int *rvec, float *s_z, float *s_x, float *s_y, int nsinc,  int nts,hypercube_float *time){
 
-  // Read the data and set up the source geometry
+   // Read the data and set up the source geometry
 
-  axis a1=domain->get_axis(1);
-  axis a2=domain->get_axis(2);
-  axis a3=domain->get_axis(3);
-  axis at=get_axis(1);
+   axis a1=domain->getAxis(1);
+   axis a2=domain->getAxis(2);
+   axis a3=domain->getAxis(3);
+   axis at=getAxis(1);
 
-  float sx=get_axis(4).o+get_axis(4).d*ishot;
-  float sy=get_axis(5).o+get_axis(5).d*ishot;
-  int ns=get_axis(4).n*get_axis(5).n;
+   float sx=getAxis(4).o+getAxis(4).d*ishot;
+   float sy=getAxis(5).o+getAxis(5).d*ishot;
+   int ns=getAxis(4).n*getAxis(5).n;
 
-  fprintf(stderr,"  RTM Data Details, encode=%d, nshots=%d \n",encode,ns);
+   fprintf(stderr,"  RTM Data Details, encode=%d, nshots=%d \n",encode,ns);
 
-  int i=0;
+   int i=0;
 
-  // Encode and sum all shots into one supershot
-  hypercube_float *tmp=(hypercube_float*)time->clone_zero();
-  for(int is=0; is<ns; is++){
-    sseek_block(myf->tagit.c_str(),get_axis(3).n*get_axis(2).n,get_axis(1).n*4*is,0);
-    sreed(myf->tagit.c_str(),tmp->vals,get_axis(1).n*get_axis(2).n*get_axis(3).n*4);
+   // Encode and sum all shots into one supershot
+   hypercube_float *tmp=(hypercube_float*)time->clone_zero();
+   for(int is=0; is<ns; is++){
+    sseek_block(myf->tagit.c_str(),getAxis(3).n*getAxis(2).n,getAxis(1).n*4*is,0);
+    sreed(myf->tagit.c_str(),tmp->vals,getAxis(1).n*getAxis(2).n*getAxis(3).n*4);
 
     for(int k=0; k < (int) tmp->get_n123(); k++) time->vals[k] += rvec[is]*tmp->vals[k]/ns;
       fprintf(stderr,"    Data summing, %d %d \n",is,rvec[is]);
 
 
-  }
-fprintf(stderr,"Shots summed \n");
+   }
+   fprintf(stderr,"Shots summed \n");
     // Set up the regular source geometry RIGHT NOW THIS IS THE SAME FOR ALL SHOTS
-    for(int i3=0; i3< (get_axis(3).n); i3++){
-      for(int i2=0; i2< get_axis(2).n; i2++, i++){
+    for(int i3=0; i3< (getAxis(3).n); i3++){
+      for(int i2=0; i2< getAxis(2).n; i2++, i++){
         s_z[i]=(sz-a1.o)/a1.d;
-        s_x[i]=(get_axis(2).o+get_axis(2).d*i2-a2.o)/a2.d;
-        s_y[i]=(get_axis(3).o+get_axis(3).d*i3-a3.o)/a3.d;
+        s_x[i]=(getAxis(2).o+getAxis(2).d*i2-a2.o)/a2.d;
+        s_y[i]=(getAxis(3).o+getAxis(3).d*i3-a3.o)/a3.d;
       }
     }
 
-  sseek(myf->tagit.c_str(),0,0);
+   sseek(myf->tagit.c_str(),0,0);
 
-}*/
-
-
+   }*/

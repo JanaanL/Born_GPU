@@ -19,10 +19,16 @@ void check_same(std::shared_ptr<my_vector>other){
 }
 void zeroFile();
 double dot(std::shared_ptr<my_vector>other);
+void initNewFile(std::string tag, std::shared_ptr<SEP::genericIO> io,
+	std::shared_ptr<SEP::hypercube> hyper,const SEP::usage_code usage);
 virtual void scale_add(const double mes,  std::shared_ptr<my_vector>vec, const double other);
 void add(std::shared_ptr<my_vector>other);
-oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,std::vector<SEP::axis> axes,bool alloc=true);
-oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,std::shared_ptr<SEP::hypercube> hyper);
+oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,std::vector<SEP::axis> axes,
+	bool alloc=true);
+oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,
+	std::shared_ptr<SEP::hypercube> hyper);
+oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag,
+	std::shared_ptr<oc_float> fle);
 oc_float(std::shared_ptr<SEP::genericIO> io,std::string tag);
 virtual void random();
 virtual void scale(double r);
@@ -34,7 +40,7 @@ virtual double sum();
 virtual void scale_add(const double sc1,std::shared_ptr<my_vector>v1,double sc2, std::shared_ptr<my_vector>v2);
 virtual double my_min();
 virtual double my_max();
-oc_float *clone(bool alloc=true, std::string tag="NONE");
+std::shared_ptr<oc_float> clone(bool alloc=true, std::string tag="NONE");
 void set_val(double val);
 void normalize(float val);
 void allocate();

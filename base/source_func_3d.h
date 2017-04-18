@@ -19,7 +19,8 @@ std::shared_ptr<hypercube_float> create_domain(int ishot);
 virtual int get_points(bool e){
 	if(e) ; return 0;
 }
-void set_compute_size(std::shared_ptr<SEP::hypercube> dom, float aper,int nbt,int nb,int nby, int fat, int blocksize);
+void set_compute_size(std::shared_ptr<SEP::hypercube> dom, float aper,int nbt,
+	int nb,int nby, int fat, int blocksize);
 int y_points(){
 	return ay.n;
 }
@@ -29,8 +30,9 @@ int x_points(){
 int z_points(){
 	return az.n;
 }
-virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,int nts, int *ilocs, float *vals){
-	if(domain==0) ; if(ishot==0) ; if(nts==0) ; if(ilocs==0) ; if(vals==0) ;
+virtual void get_source_func(std::shared_ptr<hypercube_float> domain,
+	int ishot,int nts, std::vector<int>ilocs, std::vector<float> vals){
+	if(domain==0) ; if(ishot==0) ; if(nts==0) ; if(ilocs.size()==0) ; if(vals.size()==0) ;
 }
 float get_dt(){
 	return dt;
@@ -53,7 +55,8 @@ void set_sz(float s_z){
 	sz.push_back(s_z);
 }
 virtual int get_points(bool e);
-virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,int nts, int *ilocs, float *vals);
+virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,
+	int nts, std::vector<int>ilocs, std::vector<float> vals);
 ~wavelet_source_func(){
 	delete wavelet;
 }
