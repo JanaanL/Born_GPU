@@ -4,6 +4,7 @@
 #include <ioModes.h>
 #include "source_func_3d.h"
 #include "rtm_zero_op_3d.h"
+#include "cpu_prop.h"
 
 main(int argc, char **argv){
 
@@ -36,19 +37,24 @@ main(int argc, char **argv){
 	//std::shared_ptr<oc_float> d2(new oc_float(io,"dtest.H",data));
 	//data->set_source_file(d2);
 
+
 	//int n_gpus=pars.get_int("n_gpus",1);
 	//setup_cuda(n_gpus,argc,argv);
 
 	float aper=pars->getFloat("aper",8.);
 
-	int *rand_vec=0;
+	std::vector<int> rand_vec(1.0);
+
 	bool encode=false;
-
-	//std::shared_ptr<rtm_zero_o> op(new
-	//	rtm_zero_op(pars,vel,wavelet,data,image,aper,true,encode,rand_vec,true));
+	std::shared_ptr<cpuProp> prop(new cpuProp(io));
 
 
-//	op->adjoint(false,image,data,1);
+	std::shared_ptr<rtm_zero_op> op(new
+		rtm_zero_op(pars,prop,vel,wavelet,data,image,aper,true,encode,rand_vec,true));
+
+
+
+	op->adjoint(false,image,data,1);
 
 	return 0;
 }

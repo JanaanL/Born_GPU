@@ -3,13 +3,19 @@
 #include "vel_fd_3d.h"
 #include "source_func_3d.h"
 #include "paramObj.h"
+#include "base_prop.h"
 class fd_prop {
 public:
+
+
 fd_prop(){
-};
+	;
+}
 
 bool  calc_stability(std::vector<float> & ds,int n);
-
+void setProp(std::shared_ptr<baseProp> prop){
+	_prop=prop;
+};
 void set_vel(std::shared_ptr<vel_fd_3d> v){
 	vel=v;
 }
@@ -35,7 +41,7 @@ float aper;
 int jts;
 float dtw;
 bool verb;
-
+std::shared_ptr<baseProp> _prop;
 
 
 };

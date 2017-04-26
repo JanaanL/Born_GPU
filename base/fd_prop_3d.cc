@@ -32,7 +32,7 @@ bool fd_prop::calc_stability(std::vector<float> &ds,int n){
 void fd_prop::create_transfer_sinc_source(int nsinc){
 	jts=(int)((source->get_dt())/dt);
 	sinc_bob mys(jts,nsinc);
-	//GPU
+	_prop->transferSincTableS(nsinc, jts, mys.table);
 	//transfer_sinc_table_s(nsinc,jts,mys.table);
 }
 
@@ -49,14 +49,14 @@ void fd_prop::set_fd_basics(std::shared_ptr<SEP::paramObj> par,
 	nboundt=par->getInt("nboundt",nbound);
 	int fat=4;
 	int blocksize=16;
-	//GPU
-	//create_transfer_sinc_source(8);
+
+	create_transfer_sinc_source(8);
 
 	source->set_compute_size(vel->_vel,aper,nbound,nbound,nbound,fat,blocksize);
 	nx=source->x_points();
 	nz=source->z_points();
 	ny=source->y_points();
-	//GPU
-	//create_gpu_space(vel->get_axis(1).d,vel->get_axis(2).d,vel->get_axis(3).d,bc_a,bc_b,bc_b_y,nx,ny,nz);
+	_prop->createSpace(vel->getAxis(1).d,vel->getAxis(2).d,
+		vel->getAxis(3).d,bc_a,bc_b,bc_b_y,nx,ny,nz);
 
 }

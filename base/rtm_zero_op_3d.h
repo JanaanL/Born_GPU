@@ -1,5 +1,6 @@
 #ifndef RTM_OP_3D_H
 #define RTM_OP_3D_H 1
+#include "base_prop.h"
 #include "float_1d.h"
 #include "my_operator.h"
 #include "data_rtm_3d.h"
@@ -11,7 +12,8 @@ public:
 rtm_zero_op(){
 	basic_init_op();
 }
-rtm_zero_op(std::shared_ptr<SEP::paramObj> par,std::shared_ptr<vel_fd_3d>vel,
+rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
+	std::shared_ptr<baseProp> prop, std::shared_ptr<vel_fd_3d>vel,
 	std::shared_ptr<source_func>source_func,
 	std::shared_ptr<data_rtm_3d> data_insert, std::shared_ptr<image_rtm_3d>image,
 	float aper, bool verb,
@@ -40,7 +42,6 @@ float dtd;
 bool redo;
 int base;
 std::vector<float> slice_p0;
-
 
 };
 #endif

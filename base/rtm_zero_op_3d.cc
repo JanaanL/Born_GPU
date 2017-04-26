@@ -6,11 +6,13 @@
 #include "laplac_3d.h"
 #include "map_data_3d.h"
 rtm_zero_op::rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
+	std::shared_ptr<baseProp> prop,
 	std::shared_ptr<vel_fd_3d>vel_3d, std::shared_ptr<source_func>source_func,
 	std::shared_ptr<data_rtm_3d> dat, std::shared_ptr<image_rtm_3d>img,
 	float ap,bool v,bool enc,std::vector<int> r_vec, bool do_src,bool redo_src){
 	std::vector<float> ds;
 	data=dat;
+	setProp(prop);
 	ds.push_back(dat->dt);
 
 	ds.push_back(source_func->get_dt());
@@ -19,8 +21,8 @@ rtm_zero_op::rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
 
 	calc_stability(ds,data->nt);
 	set_fd_basics(par,source_func,ap,v);
-	//GPU
-	//set_ntblock(50);
+	_prop->setNtblock(50);
+
 	image=img;
 
 	set_domain(image);
@@ -41,8 +43,8 @@ rtm_zero_op::rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
 void rtm_zero_op::create_transfer_sinc_data(int nsinc){
 	jtd=(int)((data->dt)/dt);
 	sinc_bob myr(jtd,nsinc);
-	//GPU
-	//transfer_sinc_table_d(nsinc,jtd,myr.table);
+	_prop->transferSincTableD(nsinc,jtd,myr.table);
+
 }
 
 void rtm_zero_op::create_source_fields(){
@@ -66,20 +68,20 @@ void rtm_zero_op::create_source_fields(){
 
 		source->get_source_func(src_p0,ishot,nt_big,locs,vals);
 
-		//GPU
-		//transfer_source_func(npts,nt_big,locs,vals);
+		_prop->transferSourceFunc(npts, nt_big, locs.data(), vals.data());
+
+
 		seed=locs[3] - ((int) locs[3]/10000)*10000;
 
-		std::shared_ptr<hypercube_float> vloc=vel->rand_subspace(seed,nbound,nbound,nbound,dt,src_p0);
+		std::shared_ptr<hypercube_float> vloc=
+			vel->rand_subspace(seed,nbound,nbound,nbound,dt,src_p0);
 
-		//GPU
-		//transfer_vel_func1(nx,ny,nz,vloc->vals);
 
+		_prop->transferVelFunc1(nx,ny,nz,vloc->vals);
 		time_t startwtimes, endwtimes;
 		startwtimes = time(&startwtimes);
 
-		//GPU
-		//source_prop(nx,ny,nz,false,true,src_p0->vals,src_p1->vals,jts,npts,nt);
+		_prop->sourceProp(nx,ny,nz,false,true,src_p0->vals,src_p1->vals,jts,npts,nt);
 
 		endwtimes = time(&endwtimes);
 
@@ -138,8 +140,8 @@ bool rtm_zero_op::forward(bool add, std::shared_ptr<my_vector>mvec,
 
 		source->get_source_func(src_p0,ishot,nt_big,locs_s,vals);
 
-		//GPU
-		//transfer_source_func(npts_s,nt_big,locs_s,vals);
+
+		_prop->transferSourceFunc(npts_s,nt_big,locs_s.data(),vals.data());
 
 		int seed=locs_s[3] - ((int) locs_s[3]/10000)*10000;
 
@@ -148,9 +150,9 @@ bool rtm_zero_op::forward(bool add, std::shared_ptr<my_vector>mvec,
 
 		std::shared_ptr<hypercube_float>img=image->extract_sub(ad1,ad2,ad3);
 
-		//GPU
-		//transfer_vel_func1(nx,ny,nz,vrand->vals);
-		//transfer_vel_func2(nx,ny,nz,vnone->vals);
+		_prop->transferVelFunc1(nx,ny,nz,vrand->vals);
+		_prop->transferVelFunc2(nx,ny,nz,vnone->vals);
+
 
 		data->get_source_func(src_p0,ishot,s_x,s_y,s_z,8,nt_big,shot);
 
@@ -158,8 +160,9 @@ bool rtm_zero_op::forward(bool add, std::shared_ptr<my_vector>mvec,
 
 		rec_func->zero();
 
-		//GPU
-		//transfer_receiver_func(rec_nx,rec_ny,nt_big,locs,rec_func->vals/*,s_z,s_x,s_y*/);
+
+		_prop->transferReceiverFunc(rec_nx, rec_ny, nt_big, locs.data(),
+			rec_func->vals);
 
 		std::shared_ptr<hypercube_float>img_lap=img->clone();
 
@@ -167,10 +170,8 @@ bool rtm_zero_op::forward(bool add, std::shared_ptr<my_vector>mvec,
 
 		lap.forward(false,img_lap,img);
 
-		//lap.dot_test(true);
-		//GPU
-		//rtm_forward(ad1.n,ad2.n,ad3.n,jtd,img->vals,rec_func->vals,npts_s,nt,nt_big,rec_nx,rec_ny);
-		//rtm_forward(ad1.n,ad2.n,ad3.n,jtd,img->vals,rec_func->vals,npts_s,nt,nt_big,rec_nx,rec_ny);
+
+		_prop->rtmForward(ad1.n,ad2.n,ad3.n,jtd,img->vals,rec_func->vals,npts_s,nt,nt_big,rec_nx,rec_ny);
 
 		deriv der=deriv(shot_deriv,shot);
 
@@ -213,6 +214,9 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 	int rec_nx=data->get_points1();
 	int rec_ny=data->get_points2();
 
+	float dtd=data->dt;
+	int jtd=(int)(dtd/dt);
+	int nt=(data->nt-1)*jtd+1;
 	std::vector<int> locs(npts,0),locs_s(npts_s,0);
 	std::vector<float> vals(npts_s*nt_big,0.),s_x(npts,0.),
 	s_z(npts,0.),s_y(npts,0.);
@@ -231,6 +235,7 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 
 	int nts=(int)(nt/jts)+1;
 	int nshots=data->nshots();
+	int nptsS=source->get_points(false);
 
 	//nshots=1;
 
@@ -245,8 +250,8 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 		source->get_source_func(src_p0,ishot,nt_big,locs_s,vals);
 		data->get_source_func(src_p0,ishot,s_x,s_y,s_z,8,nt_big,shot);
 
-		//GPU
-		//transfer_source_func(npts_s,nt_big,locs_s,vals);
+		_prop->transferSourceFunc(npts_s,nt_big,locs_s.data(),vals.data());
+
 
 		seed=locs_s[3] - ((int) locs_s[3]/10000)*10000;
 
@@ -254,9 +259,8 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 		//hypercube_float *vnone=vel->rand_subspace(seed,0,0,0,dt,src_p0);
 		std::shared_ptr<hypercube_float>img=src_p0->clone();
 
-//GPU
-		//transfer_vel_func1(nx,ny,nz,vrand->vals);
-		//transfer_vel_func2(nx,ny,nz,vnone->vals);
+		_prop->transferVelFunc1(nx,ny,nz,vrand->vals);
+		//_prop->transferVelFunc2(nx,ny,nz,vnone->vals);
 
 		deriv der=deriv(shot_deriv,shot);
 		der.adjoint(false,shot_deriv,shot);
@@ -264,17 +268,14 @@ bool rtm_zero_op::adjoint(bool add, std::shared_ptr<my_vector>mvec,
 		map_data mapit(npts,s_x,s_y,s_z,locs,src_p0,rec_func,shot_deriv,nt_big);
 		mapit.adjoint(false,rec_func,shot_deriv);
 
-/*NEED TO DO THIS*/
-		//	sreed("source_fields",src_p1->vals,4*ad1.n*ad2.n*ad3.n);
-		//sreed("source_fields",src_p0->vals,4*ad1.n*ad2.n*ad3.n);
+		_prop->sourceProp(ad1.n,ad2.n,ad3.n,false,true,src_p0->vals,src_p1->vals,jts,nptsS,nt);
 
-//GPU
-//    transfer_receiver_func(rec_nx,rec_ny,nt_big,locs,rec_func->vals/*,s_z,s_x,s_y*/);
+		_prop->transferReceiverFunc(rec_nx,rec_ny,nt_big,locs.data(),rec_func->vals);
 
 		time_t startwtimem, endwtimem;
 		startwtimem = time(&startwtimem);
-//GPU
-//    rtm_adjoint(ad1.n,ad2.n,ad3.n,jtd,src_p0->vals,src_p1->vals,img->vals,npts_s,nt/*,src,recx*/);
+		_prop->rtmAdjoint(ad1.n,ad2.n,ad3.n,jtd,src_p0->vals,src_p1->vals,img->vals,npts_s,nt);
+
 
 		endwtimem = time(&endwtimem);
 
