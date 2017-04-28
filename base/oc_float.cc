@@ -109,10 +109,11 @@ void oc_float::set_val(double val){
 	float *zero=new float[nbuf];
 	for(int i=0; i < nbuf; i++) zero[i]=val;
 	long long ndone=0;
+
 	while(ndone!=ndo) {
-		long long nbuf=std::min(ndo-ndone,nbuf);
-		_file->writeFloatStream(zero,nbuf);
-		ndone+=nbuf;
+		long long n=std::min(ndo-ndone,nbuf);
+		_file->writeFloatStream(zero,n);
+		ndone+=n;
 	}
 
 	delete [] zero;
@@ -413,6 +414,7 @@ std::string oc_float::make_temp(){
 
 }
 void oc_float::tagInit(std::string tag){
+	fprintf(stderr,"in tag init \n");
 	_file=_io->getRegFile(tag,SEP::usageInOut);
 
 }

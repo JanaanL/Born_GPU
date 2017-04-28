@@ -68,8 +68,9 @@ std::shared_ptr<SEP::genericRegFile> _file;
 std::string getTag(){
 	return _tag;
 }
-private:
 std::shared_ptr<SEP::genericIO> _io;
+
+private:
 bool temp;
 std::string _tag;
 };

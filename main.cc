@@ -15,15 +15,17 @@ main(int argc, char **argv){
 
 	std::shared_ptr<SEP::genericIO>  io=modes.getDefaultIO();
 	std::shared_ptr<SEP::paramObj> pars=io->getParamObj();
-
-
+	fprintf(stderr,"becore data\n");
 	std::shared_ptr<data_rtm_3d> data(new data_rtm_3d("data",io));
-	std::shared_ptr<wavelet_source_func> wavelet(new wavelet_source_func("wavelet"));
-
+	fprintf(stderr,"before waelet \n");
+	std::shared_ptr<wavelet_source_func> wavelet(new wavelet_source_func(io,"wavelet"));
+	fprintf(stderr,"after wavelet \n");
 	float src_depth=pars->getFloat("src_depth",0.);
+	fprintf(stderr,"before velicty \n");
 	std::shared_ptr<vel_fd_3d> vel(new vel_fd_3d(io,"velocity"));
+	fprintf(stderr,"after velicity \n");
 	std::shared_ptr<image_rtm_3d> image(new image_rtm_3d(io,"image",vel));
-
+	fprintf(stderr,"after image \n");
 	SEP::axis asx=data->getAxis(4);
 	SEP::axis asy=data->getAxis(5);
 

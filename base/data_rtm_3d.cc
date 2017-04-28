@@ -18,7 +18,6 @@ data_rtm_3d::data_rtm_3d(std::string tg, std::shared_ptr<SEP::genericIO> io){
 	dsamp=dt;
 
 	sz=io->getParamObj()->getFloat("rec_depth",0.);
-	fprintf(stderr,"sz is %f \n",sz);
 
 }
 

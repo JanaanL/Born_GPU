@@ -64,7 +64,6 @@ int nt;
 int n11;
 std::shared_ptr<oc_float> myf;
 float max_time,dt;
-std::shared_ptr<SEP::genericIO> _io;
 
 };
 #endif

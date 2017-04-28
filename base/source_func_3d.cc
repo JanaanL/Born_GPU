@@ -17,7 +17,7 @@ void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom,
 
 	ay.n+=2*nbound_y;
 	ax.n+=2*nbound;
-	az.n+=2*nbound;                                                                                                                                                            //nbt+nb+2*fat;
+	az.n+=2*nbound;                                                                                                                                                                                          //nbt+nb+2*fat;
 	//az.n+=nbt+nb+2;//*fat;
 
 	int rem_x=ax.n-((int) (ax.n/16))*16;
@@ -108,9 +108,10 @@ void wavelet_source_func::get_source_func(std::shared_ptr<hypercube_float> domai
 int wavelet_source_func::get_points(bool e ){
 	return 9;
 }
-wavelet_source_func::wavelet_source_func(std::string tag){
+wavelet_source_func::wavelet_source_func(std::shared_ptr<SEP::genericIO> io, std::string tag){
 
-
+	std::cerr<<"WAVELETE INIT"<<tag<<std::endl;
+	_io=io;
 	tagInit(tag);
 	std::shared_ptr<hypercube_float> tmp(new hypercube_float(getHyper()));
 
@@ -139,9 +140,8 @@ void wavelet_source_func::set_sources_axes(float s_z, SEP::axis src_axis1, SEP::
 
 }
 
-wavefield_source_func::wavefield_source_func(std::string tag){
-
-
+wavefield_source_func::wavefield_source_func(std::shared_ptr<SEP::genericIO> io,std::string tag){
+	_io=io;
 	tagInit(tag);
 	std::shared_ptr<hypercube_float> tmp(new hypercube_float(getHyper()));
 

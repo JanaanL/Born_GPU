@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3 -g")
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -23,10 +23,6 @@ INCLUDE_DIRECTORIES(${genericIO_DIRNAME_include})
 
 
 
-install(PROGRAMS ${PROJECT_BINARY_DIR}/Sep_cube
-
- DESTINATION bin
-)
 
 add_subdirectory(base)
 
@@ -34,26 +30,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 
 ADD_EXECUTABLE(RTM3D main.cc)
 TARGET_LINK_LIBRARIES(RTM3D base genericCpp)
-#add_subdirectory(gui)
 
 
-
-
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gui)
-#link_directories(${CURRENT_BINARY_DIR}/base ${CURRENT_BINARY_DIR}/gui)
-
-
-
-#ADD_EXECUTABLE(qt_cube main.cpp ${QtApp_RCC_SRCS} )
-#set_property(TARGET qt_cube PROPERTY LINKER_LANGUAGE CXX)
-#TARGET_LINK_LIBRARIES(qt_cube gui)
-#TARGET_LINK_LIBRARIES(qt_cube base)
-#TARGET_LINK_LIBRARIES(qt_cube genericCpp ${GENERIC_EXPORT_LIBS} ${LIBTBB})
-
-#TARGET_LINK_LIBRARIES(qt_cube ${LIBTBB})
-
-#install(TARGETS qt_cube
-
-# DESTINATION bin
-#)
+add_subdirectory(util)
+install(TARGETS RTM3D DESTINATION bin)

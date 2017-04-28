@@ -6,7 +6,7 @@ class source_func : public wavefield_insert_3d {
 public:
 source_func(){
 };
-source_func(std::string tag);
+source_func(std::shared_ptr<SEP::genericIO> io,std::string tag);
 
 
 
@@ -50,7 +50,7 @@ class wavelet_source_func : public source_func {
 public:
 wavelet_source_func(){
 };
-wavelet_source_func(std::string tag);
+wavelet_source_func(std::shared_ptr<SEP::genericIO> io,std::string tag);
 void set_sz(float s_z){
 	sz.push_back(s_z);
 }
@@ -70,7 +70,7 @@ class wavefield_source_func : public source_func {
 public:
 wavefield_source_func(){
 };
-wavefield_source_func(std::string tag);
+wavefield_source_func(std::shared_ptr<SEP::genericIO> io, std::string tag);
 virtual int get_points(bool e);
 void set_sources_depth(float s_z){
 	sz.push_back(s_z);
