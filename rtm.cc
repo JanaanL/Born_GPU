@@ -27,15 +27,7 @@ main(int argc, char **argv){
 	wavelet->set_sources_axes(src_depth,asx,asy);
 
 
-	//image->zero();
-	//image->set_source_file(image);
 
-	//std::shared_ptr<oc_float> d2(new oc_float(io,"dtest.H",data));
-	//data->set_source_file(d2);
-
-
-	//int n_gpus=pars.get_int("n_gpus",1);
-	//setup_cuda(n_gpus,argc,argv);
 
 	float aper=pars->getFloat("aper",8.);
 

@@ -7,8 +7,8 @@ class map_data : public my_operator {
 public:
 map_data(){
 };
-map_data(int npt,std::vector<float> s_x,std::vector<float >s_y, std::vector<float >s_z,
-	std::vector<int> locs,std::shared_ptr<hypercube_float> model,
+map_data(int npt,std::vector<float> &s_x,std::vector<float >&s_y, std::vector<float >&s_z,
+	std::vector<int> &locs,std::shared_ptr<hypercube_float> model,
 	std::shared_ptr<hypercube_float> dom, std::shared_ptr<hypercube_float> ran,int ntbig);
 
 virtual bool forward(bool add, std::shared_ptr<my_vector> model, std::shared_ptr<my_vector>data,int iter=0);

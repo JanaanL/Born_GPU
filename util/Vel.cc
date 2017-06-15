@@ -27,7 +27,7 @@ int main(int argc, char **argv){
 	outp->setHyper(hyp);
 	outp->writeDescription();
 
-	float vconst=par->getFloat("vconst",2.5);
+	float vconst=par->getFloat("vconst",2.0);
 	std::vector<float> val(hyp->getN123(),vconst);
 
 

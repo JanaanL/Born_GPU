@@ -8,6 +8,8 @@
 
 void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom,
 	float ap,int nbt, int nb, int nby, int fat, int blocksize){
+	
+	
 	ax=dom->getAxis(1);
 	ay=dom->getAxis(2);
 	az=dom->getAxis(3);
@@ -19,6 +21,9 @@ void source_func::set_compute_size(std::shared_ptr<SEP::hypercube> dom,
 	ax.n+=2*nbound;
 	az.n+=2*nbound;                                                                                                                                                                                          //nbt+nb+2*fat;
 	//az.n+=nbt+nb+2;//*fat;
+
+
+
 
 	int rem_x=ax.n-((int) (ax.n/16))*16;
 	int rem_y=ay.n-((int) (ay.n/16))*16;
@@ -70,7 +75,7 @@ std::shared_ptr<hypercube_float> source_func::create_domain(int ishot){
 }
 
 void wavelet_source_func::get_source_func(std::shared_ptr<hypercube_float> domain,
-	int ishot, int nts, std::vector<int>locs, std::vector<float> time){
+	int ishot, int nts, std::vector<int> &locs, std::vector<float> &time){
 	SEP::axis a1=domain->getAxis(1);
 	SEP::axis a2=domain->getAxis(2);
 	SEP::axis a3=domain->getAxis(3);
@@ -87,7 +92,6 @@ void wavelet_source_func::get_source_func(std::shared_ptr<hypercube_float> domai
 	for(int it=0; it < nts*9; it++) {
 		time[it]=0;
 	}
-
 	for(int i3=iz-1; i3 <= iz-1; i3++) {
 		float zn=fz-i3;
 		for(int i2=iy-1; i2 <= iy+1; i2++) {
@@ -110,16 +114,14 @@ int wavelet_source_func::get_points(bool e ){
 }
 wavelet_source_func::wavelet_source_func(std::shared_ptr<SEP::genericIO> io, std::string tag){
 
-	std::cerr<<"WAVELETE INIT"<<tag<<std::endl;
 	_io=io;
 	tagInit(tag);
 	std::shared_ptr<hypercube_float> tmp(new hypercube_float(getHyper()));
 
-	std::shared_ptr<hypercube_float> wavelet( new hypercube_float(getHyper()));
+ wavelet.reset( new hypercube_float(getHyper()));
 
 	readAll(tmp);
 	wavelet->vals[getAxis(1).n-1]=0;
-
 	for(int it=0; it < this->getAxis(1).n-1; it++) {
 		wavelet->vals[it]=(tmp->vals[it+1]-tmp->vals[it])/tmp->getAxis(1).d;
 	}
@@ -160,15 +162,15 @@ wavefield_source_func::wavefield_source_func(std::shared_ptr<SEP::genericIO> io,
 	dt=getAxis(1).d;
 }
 
-void wavefield_source_func::get_source_func(std::shared_ptr<hypercube_float> domain, int ishot, int nts, int *locs, float *time){
+void wavefield_source_func::get_source_func(std::shared_ptr<hypercube_float> domain, int ishot, int nts, std::vector<int> &locs, std::vector<float> &time){
 	SEP::axis a1=domain->getAxis(1);
 	SEP::axis a2=domain->getAxis(2);
 	SEP::axis a3=domain->getAxis(3);
 	SEP::axis at=getAxis(1);
 
+
 	int iz=(sz[0]-a3.o)/a3.d+.5;
 	int ipos=0;
-	fprintf(stderr,"CHECK BEFORE %f %f %f %d \n",sz[0],a3.o,a3.d,a3.n);
 	for(long long i=0; i < (long long) getAxis(3).n*(long long) getAxis(2).n*(nts); i++)
 		time[i]=0;
 
@@ -188,7 +190,6 @@ void wavefield_source_func::get_source_func(std::shared_ptr<hypercube_float> dom
 			}
 		}
 	}
-	fprintf(stderr,"CHECK LOCS  %d %d  \n",locs[0],locs[1]);
 //assert(1==2);
 
 

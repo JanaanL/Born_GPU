@@ -2,6 +2,7 @@
 rm -rf build
 mkdir build
 cd build
-cmake -DgenericIO_DIR=/opt/genericIO/lib -DCMAKE_INSTALL_PREFIX=/opt/Born ..
+export CXX=g++
+cmake -DgenericIO_DIR=/sep/bob/genericIO/lib -DCMAKE_INSTALL_PREFIX=/sep/bob/Born ..
 make
 make install

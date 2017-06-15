@@ -56,7 +56,7 @@ void data_rtm_3d::add_data(int ishot, std::shared_ptr<hypercube_float> dat){
 }
 
 void data_rtm_3d::get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,
-	std::vector<float>s_x, std::vector<float>s_y, std::vector<float>s_z, int nsinc,
+	std::vector<float>&s_x, std::vector<float>&s_y, std::vector<float>&s_z, int nsinc,
 	int nts,std::shared_ptr<hypercube_float> time){
 
 	// Read the data and set up the source geometry
@@ -67,10 +67,13 @@ void data_rtm_3d::get_source_func(std::shared_ptr<hypercube_float> domain, int i
 	SEP::axis at=getAxis(1);
 
 	// Seek to shot position and read
-	_file->seekTo((long long)(getAxis(3).n*getAxis(2).n)*(long long)(getAxis(1).n*4),0);
+	
+	
+	_file->seekTo(ishot*(long long)(getAxis(3).n*getAxis(2).n)*(long long)(getAxis(1).n*4),0);
 	_file->readFloatStream(time->vals,getAxis(1).n*getAxis(2).n*getAxis(3).n);
 
 	int i=0;
+
 
 	// Set up the regular source geometry
 	for(int i3=0; i3< (getAxis(3).n); i3++) {

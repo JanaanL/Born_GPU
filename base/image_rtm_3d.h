@@ -17,7 +17,6 @@ std::shared_ptr<float_3d> extract_sub(SEP::axis a1, SEP::axis a2, SEP::axis a3);
 
 void set_source_file(std::shared_ptr<oc_float> ptr);
 std::shared_ptr<hypercube_float> image, mute;
-std::shared_ptr<oc_float> myf;
 std::shared_ptr<SEP::hypercube> imgHyper;
 
 };

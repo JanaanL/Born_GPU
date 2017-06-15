@@ -3,24 +3,18 @@
 
 sinc_bob::sinc_bob(int nt, int ns){
   ntab=nt; nsinc=ns;
-  table=new float*[ntab];
   dtab=1./(float)(ntab);
   float t=0.;
   float *junk=new float[ns*3];
   for(int it=0; it < ntab; it++,t+=dtab){
-    table[it]=new float[nsinc];
-    this->mksinc(table[it],nsinc,t,junk);
+    std::vector<float> tb(nsinc,0.);
+    this->mksinc(tb.data(),nsinc,t,junk);
+    table.push_back(tb);
   }
   delete [] junk;
 }
 void sinc_bob::delete_sinc(){
 
-  if(table!=0){
-    for(int it=0; it < ntab; it++) delete [] table[it];
-    delete [] table;
-
-  }
-  table=0;
 }
 
 /************************************************************************

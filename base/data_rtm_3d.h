@@ -29,7 +29,7 @@ virtual int get_points2();
 
 
 void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,
-	std::vector<float> s_x, std::vector<float>s_y, std::vector<float> s_z,
+	std::vector<float>& s_x, std::vector<float>&s_y, std::vector<float>& s_z,
 	int nsinc,  int nts, std::shared_ptr<hypercube_float> time);
 //void get_source_func_encode(hypercube_float *domain, int ishot, bool encode, int *rvec, float *s_z, float *s_x, float *s_y, int nsinc,  int nts, hypercube_float *time);
 void set_source_file(std::shared_ptr<oc_float> pntr){

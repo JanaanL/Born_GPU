@@ -14,17 +14,14 @@ bool fd_prop::calc_stability(std::vector<float> &ds,int n){
 	float dmax=vel->get_max_samp();
 
 
-	float d=.5*dmin/vmax;
-	fprintf(stderr,"check this %f %f %f \n",dmin,vmax,d);
+	float d=.47*dmin/vmax;
 
 	dt=ds[0]/ceilf(ds[0]/d);
 
 //  dt=.001;
 	nt=(n-1)*(int)(ds[0]/dt)+1;
-	fprintf(stderr,"CHECK Nt=%d ds=%f dt=%f \n",nt,ds[0],dt);
 	for(int i=0; i < (int)ds.size(); i++) d=ds[i]/dt-(int)(ds[i]/dt+.001);
 
-	fprintf(stderr,"checj thus %f %f :%f \n",d,dt,ds[0]/dt);
 /*
         if(fabs(d) >.01) {
                 param->error(std::string("sampling match problem ")+std::to_string(d)+

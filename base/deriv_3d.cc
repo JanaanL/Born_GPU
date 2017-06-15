@@ -10,12 +10,11 @@ bool deriv::adjoint(bool add, std::shared_ptr<my_vector>model, std::shared_ptr<m
 	SEP::axis a1=d->getAxis(1);
 	SEP::axis a2=d->getAxis(2);
 	SEP::axis a3=d->getAxis(3);
-
 	for(int i3=0; i3 < a3.n; i3++) {
 		m->vals [i3*a1.n*a2.n]+=(d->vals[i3*a1.n*a2.n+1] - d->vals[i3*a1.n*a2.n])/a1.d;
 		for(int i2=0; i2 < a2.n; i2++) {
 			m->vals [i2*a1.n+i3*a1.n*a2.n]+=(d->vals[i2*a1.n+i3*a1.n*a2.n+1] - d->vals[i2*a1.n+i3*a1.n*a2.n ])/a1.d;
-			for(int i1=1; i1 < a1.n; i1++) {
+			for(int i1=0; i1 < a1.n-1; i1++) {
 				m->vals [i3*a1.n*a2.n+i2*a1.n+i1]+=(d->vals[i1+i2*a1.n+i3*a1.n*a2.n+1] - d->vals[i1+i2*a1.n+i3*a1.n*a2.n])/a1.d;
 			}
 		}
@@ -37,7 +36,7 @@ bool deriv::forward(bool add, std::shared_ptr<my_vector> model, std::shared_ptr<
 		for(int i2=0; i2 < a2.n; i2++) {
 			d->vals [1+i2*a1.n+i3*a1.n*a2.n]+= m->vals [i2*a1.n+i3*a1.n*a2.n]/a1.d;
 			d->vals [i2*a1.n+i3*a1.n*a2.n]-= m->vals [i2*a1.n+i3*a1.n*a2.n]/a1.d;
-			for(int i1=1; i1 < a1.n; i1++) {
+			for(int i1=0; i1 < a1.n-1; i1++) {
 				d->vals [i1+i2*a1.n+i3*a1.n*a2.n]-= m->vals [i3*a1.n*a2.n+i2*a1.n+i1]/a1.d;
 				d->vals [i1+i2*a1.n+i3*a1.n*a2.n+1]+= m->vals [i3*a1.n*a2.n+i2*a1.n+i1]/a1.d;
 			}

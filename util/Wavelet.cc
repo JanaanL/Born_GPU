@@ -19,7 +19,7 @@ int main(int argc, char **argv){
 
 	int nt=par->getInt("nt",128);
 	float dt=par->getFloat("dt",.004);
-	float fund=par->getFloat("fund",20.);
+	float fund=par->getFloat("fund",10.);
 
 	SEP::axis a=axis(nt,0.,dt);
 	std::shared_ptr<hypercube> hyp(new hypercube(a));
@@ -28,10 +28,10 @@ int main(int argc, char **argv){
 	outp->setHyper(hyp);
 	outp->writeDescription();
 
-	float pi=atan(1.f)*4;
+	float pi=atan(1.f)*4;	
 	std::vector<float> val(nt,0.);
 	for(int it=0; it < nt; it++) {
-		float tm=-.064;
+		float tm=-.064+it*dt;
 		val[it]=(1.-2.*(pi*pi)*fund*fund*tm*tm) *expf(-pi*pi*fund*fund*tm*tm);
 	}
 

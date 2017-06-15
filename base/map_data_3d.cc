@@ -1,8 +1,8 @@
 #include "map_data_3d.h"
 #include "math.h"
 
-map_data::map_data(int npt,std::vector<float> s_x,std::vector<float>s_y,
-	std::vector<float> s_z, std::vector<int> locs,
+map_data::map_data(int npt,std::vector<float> &s_x,std::vector<float>&s_y,
+	std::vector<float> &s_z, std::vector<int> & locs,
 	std::shared_ptr<hypercube_float>model,
 	std::shared_ptr<hypercube_float> dom, std::shared_ptr<hypercube_float>
 	ran,int ntbig){
@@ -31,9 +31,8 @@ map_data::map_data(int npt,std::vector<float> s_x,std::vector<float>s_y,
 		zn=0.;
 		scale[ia]=expf(-zn*zn-xn*xn-yn*yn);
 		map[ia]=ix+iy*n1+iz*n1*n2;
-
 	}
-	fprintf(stderr,"CHECK %d %f %f %f\n",map[npt-1],s_z[npt-1],s_x[npt-1],s_y[npt-1]);
+	locs=map;
 	set_domain(dom);
 	set_range(ran);
 }

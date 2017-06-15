@@ -7,16 +7,17 @@ image_rtm_3d::image_rtm_3d(std::shared_ptr<SEP::genericIO> io,std::string tg,std
 	std::vector<SEP::axis> axes;
 	initNewFile(tg,io,imgHyper,SEP::usageInOut);
 
-
+ fprintf(stderr,"in init \n");
 	image->zero();
+	fprintf(stderr,"should have zeroed \n");
 //  hypercube_float *mute=(hypercube_float*)image->clone_zero();
 //  sreed("mute",mute->vals,4*get_axis(1).n*get_axis(2).n*get_axis(3).n);
 }
 
 void image_rtm_3d::set_source_file(std::shared_ptr<oc_float> ptr){
-	myf=ptr;
-	myf->_file->seekTo(0,0);
-	myf->_file->readFloatStream(image->vals,imgHyper->getN123());
+//	myf=ptr;
+	//myf->_file->seekTo(0,0);
+//	myf->_file->readFloatStream(image->vals,imgHyper->getN123());
 
 
 }
@@ -54,9 +55,9 @@ std::shared_ptr<float_3d> image_rtm_3d::extract_sub(SEP::axis a1i, SEP::axis a2i
 	SEP::axis a1o=imgHyper->getAxis(1);
 	SEP::axis a2o=imgHyper->getAxis(2);
 	SEP::axis a3o=imgHyper->getAxis(3);
-	myf->_file->seekTo(0,0);
+	_file->seekTo(0,0);
 	image->zero();
-	myf->_file->readFloatStream(image->vals,image->getN123());
+	_file->readFloatStream(image->vals,image->getN123());
 
 	std::shared_ptr<float_3d> img(new float_3d(a1i,a2i,a3i));
 	img->zero();
@@ -97,13 +98,19 @@ void image_rtm_3d::write_volume(){
 //  for(int h=0; h<image->get_n123(); h++){
 	//  image->vals[h]=image->vals[h]*mute->vals[h];
 	// }
-	myf->_file->seekTo(0,0);
-	myf->_file->writeFloatStream(image->vals,image->getN123());
+	return;
+	std::stringstream ss;
+	_file->getHyper()->infoStream(ss);
+	image->infoStream(ss);
+	std::cerr<<ss.str()<<std::endl;
+	_file->seekTo(0,0);
+	_file->writeFloatStream(image->vals,image->getN123());
 
 }
 
 void image_rtm_3d::write_final_volume(){
-	myf->_file->seekTo(0,0);
-	myf->_file->writeFloatStream(image->vals,image->getN123());
+fprintf(stderr,"in write final volume \n");
+	_file->seekTo(0,0);
+	_file->writeFloatStream(image->vals,image->getN123());
 
 }

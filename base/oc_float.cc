@@ -8,6 +8,7 @@
 oc_float::oc_float(std::shared_ptr<SEP::genericIO> io, std::string tag,std::vector<SEP::axis> axes,bool alloc){
 	_io=io;
 	_file=_io->getRegFile(tag,SEP::usageInOut);
+	fprintf(stderr,"should have gotten regular file \n");
 	std::shared_ptr<SEP::hypercube> hyper(new SEP::hypercube(axes));
 	_file->setHyper(hyper);
 
@@ -91,7 +92,6 @@ std::shared_ptr<oc_float> oc_float::clone(bool alloc, std::string tag){
 
 	std::vector<SEP::axis> axes;
 
-
 	std::string val;
 
 	if(tag=="NONE") val=make_temp();
@@ -101,9 +101,11 @@ std::shared_ptr<oc_float> oc_float::clone(bool alloc, std::string tag){
 		tmp=this->clone(true,val);
 	}
 	else tmp=this->clone(false,val);
+
 	return tmp;
 }
 void oc_float::set_val(double val){
+_file->seekTo(0,0);
 	long long ndo=_file->getHyper()->getN123();
 	long long nbuf=1000*1000;
 	float *zero=new float[nbuf];
@@ -414,7 +416,6 @@ std::string oc_float::make_temp(){
 
 }
 void oc_float::tagInit(std::string tag){
-	fprintf(stderr,"in tag init \n");
 	_file=_io->getRegFile(tag,SEP::usageInOut);
 
 }

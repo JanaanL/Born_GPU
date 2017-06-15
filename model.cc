@@ -48,8 +48,7 @@ main(int argc, char **argv){
 		rtm_zero_op(pars,prop,vel,wavelet,data,image,aper,true,encode,rand_vec,true));
 
    
-
-	op->adjoint(false,image,data,1);
-    image->write_final_volume();
+	op->forward(false,image,data,1);
+ 
 	return 0;
 }

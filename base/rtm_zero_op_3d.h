@@ -19,7 +19,6 @@ rtm_zero_op(std::shared_ptr<SEP::paramObj> par,
 	float aper, bool verb,
 	bool encode, std::vector<int > rand_vec, bool do_src=true,bool redo_src=false);
 void create_source_fields();
-void migrate(std::shared_ptr<image_rtm_3d>m,std::shared_ptr<data_rtm_3d> d);
 
 virtual bool forward(bool add, std::shared_ptr<my_vector> model, std::shared_ptr<my_vector> data, int iter);
 virtual bool adjoint(bool add, std::shared_ptr<my_vector> model, std::shared_ptr<my_vector> data, int iter);

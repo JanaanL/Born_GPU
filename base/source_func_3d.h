@@ -2,6 +2,7 @@
 #define WAVELET_RTM_3D_H 1
 #include <hypercube_float.h>
 #include "wavefield_insert_3d.h"
+#include<cassert>
 class source_func : public wavefield_insert_3d {
 public:
 source_func(){
@@ -31,8 +32,9 @@ int z_points(){
 	return az.n;
 }
 virtual void get_source_func(std::shared_ptr<hypercube_float> domain,
-	int ishot,int nts, std::vector<int>ilocs, std::vector<float> vals){
-	if(domain==0) ; if(ishot==0) ; if(nts==0) ; if(ilocs.size()==0) ; if(vals.size()==0) ;
+	int ishot,int nts, std::vector<int> &ilocs, std::vector<float> &vals){
+	if(domain==0) ; if(ishot==0) ; if(nts==0) ; if(ilocs.size()==0) ;
+	assert(1==2);
 }
 float get_dt(){
 	return dt;
@@ -56,13 +58,12 @@ void set_sz(float s_z){
 }
 virtual int get_points(bool e);
 virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,
-	int nts, std::vector<int>ilocs, std::vector<float> vals);
+	int nts, std::vector<int >&ilocs,  std::vector<float> &vals);
 ~wavelet_source_func(){
-	delete wavelet;
 }
 void set_sources_axes(float s_z, SEP::axis src_axis1, SEP::axis src_axis2);
 
-hypercube_float *wavelet;
+std::shared_ptr<hypercube_float> wavelet;
 
 
 };
@@ -74,9 +75,8 @@ wavefield_source_func(std::shared_ptr<SEP::genericIO> io, std::string tag);
 virtual int get_points(bool e);
 void set_sources_depth(float s_z){
 	sz.push_back(s_z);
-	fprintf(stderr,"JUST SET %f  \n",s_z);
 }
-virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,int nts, int *ilocs, float *vals);
+virtual void get_source_func(std::shared_ptr<hypercube_float> domain, int ishot,int nts, std::vector<int> &ilocs, std::vector<float> &vals);
 
 std::shared_ptr<hypercube_float> wavefield;
 
