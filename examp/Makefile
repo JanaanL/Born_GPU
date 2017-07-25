@@ -26,7 +26,7 @@ image.small: vel.small.json wavelet.json data.small.json model.P
 image: vel.big.json wavelet.json data.big.json model.P
 	RTM3D   json=image.P
 	
-model: vel.big.json wavelet.json data.big.json model.P
+model: vel.big.json wavelet.json model.P
 	Model3D   json=model.P
 	
 model.small: vel.small.json wavelet.json data.small.json model.small.P
