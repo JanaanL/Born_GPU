@@ -11,3 +11,6 @@ junk
 RUN
 *.o
 *P
+*.err
+*.out
+sendit.*
