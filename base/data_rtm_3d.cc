@@ -8,9 +8,7 @@ data_rtm_3d::data_rtm_3d(std::string tg, std::shared_ptr<SEP::genericIO> io){
 	_io=io;
 
 
-fprintf(stderr,"before tag init \n");
 	tagInit(tg);
-fprintf(stderr,"after tag ini \n");
 	SEP::axis a=getAxis(1);
 	max_time=a.o+a.d*(a.n-1);
 	max_time=max_time;
