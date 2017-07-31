@@ -12,7 +12,7 @@ def write_file(xx,yy):
       x.write('"d3" : 25,\n')
       x.write('"d4" : 25,\n')
       x.write('"d5" : 25,\n')
-      x.write('"filename" : "/scr1/bob/data.big.json.%d.%d.dat",\n'%(int(xx),int(yy)))
+      x.write('"filename" : "/data/sep/bob/test/data.big.json.%d.%d.dat",\n'%(int(xx),int(yy)))
       x.write('"label1" : "Undefined",\n')
       x.write('"label2" : "Undefined",\n')
       x.write('"label3" : "Undefined",\n')
@@ -32,32 +32,47 @@ def write_file(xx,yy):
       par="model.%d.%d.P"%(xx,yy);
       y=open(par,"w");
       y.write("{\n")
-      y.write('"data": "data.big.%d.%d.json",\n'%(xx,yy))
-      y.write('"image": "refl.big.json\",\n')
-      y.write('"velocity": "vel.big.json\",\n')
-      y.write('"wavelet": "wavelet.json"\n}\n')
+      y.write('"data": "/data/sep/bob/test/cpp/born2/examp/data.big.%d.%d.json",\n'%(xx,yy))
+      y.write('"image": "/data/sep/bob/test/cpp/born2/examp/refl.big.json\",\n')
+      y.write('"velocity": "/data/sep/bob/test/cpp/born2/examp/vel.big.json\",\n')
+      y.write('"wavelet": "/data/sep/bob/test/cpp/born2/examp/wavelet.json"\n}\n')
       y.close()
   
 def copy_file(x,y):
   print "hould copy"
-  commands.getoutput("cp /scr1/bob/data.big.json.dat /scr1/bob/data.big.%d.%d.json.dat"%(x,y));
+  commands.getoutput("cp /data/sep/bob/test/data.big.json.dat /data/sep/bob/test/data.big.%d.%d.json.dat"%(x,y));
   
   
 def run_job(x,y):
-  xx="Model3D json=model.%d.%d.P"%(x,y)
-  print xx;
-  commands.getoutput("Model3D json=model.%d.%d.P"%(x,y))
+   stat,out=commands.getstatusoutput("Window3d < srcloci.H >srcloci.%d.H f2=%d n2=1"%(i,i));
+   f=open("sendit.%d.%d.sh"%(x,y),"w")
+   f.write( "#!/bin/tcsh\n");
+   f.write("#PBS -N 3dsyn.%d.%d\n"%(x,y))
+   f.write("#PBS -l nodes=1:ppn=16\n");
+   f.write("#PBS -q sep\n");
+   f.write("#PBS -V\n");
+   f.write("#PBS -e ./test%d.%d.err\n"%(x,y));
+   f.write("#PBS -o ./test%d.%d.out\n"%(x,y));
+   f.write("#$ -cwd\n");
+   f.write("#\n");
+   f.write("date\n");
+   f.write( "/data/sep/bob/test/Born/bin/Model3D json=/data/sep/bob/test/cpp/born2/examp/model.%d.%d.P\n"%(x,y))
+   f.write("date\n");
+   f.close();
+   commands.getstatusoutput("qsub sendit.%d.%d.sh"%(x,y))
+#  commands.getoutput("/data/sep/bob/test/Born/bin/Model3D json=model.%d.%d.P"%(x,y))
 	
   
 
 
 
 
-
-for i2 in range(38):
-  for i1 in range(38):
-     x.append(i2*200.);
-     y.append(i1*200.);
+for ibigOut in range(4):
+  for ibigIn in range(4):
+    for i2 in range(5,10):
+      for i1 in range(10):
+        x.append(i2*800.+ibigOut*200);
+        y.append(i1*800.+ibigIn*200);
      
 
 

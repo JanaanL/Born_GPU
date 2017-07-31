@@ -5,26 +5,25 @@
 #include "source_func_3d.h"
 #include "rtm_zero_op_3d.h"
 #include "cpu_prop.h"
+#include<iostream>
 
 main(int argc, char **argv){
 
 
 	SEP::ioModes modes(argc,argv);
 
-fprintf(stderr,"die1 \n");
 
 	std::shared_ptr<SEP::genericIO>  io=modes.getDefaultIO();
 	std::shared_ptr<SEP::paramObj> pars=io->getParamObj();
-fprintf(stderr,"die1 \n");
 	std::shared_ptr<data_rtm_3d> data(new data_rtm_3d("data",io));
-fprintf(stderr,"die1 \n");
 	std::shared_ptr<wavelet_source_func> wavelet(new wavelet_source_func(io,"wavelet"));
 	float src_depth=pars->getFloat("src_depth",0.);
-fprintf(stderr,"die1 \n");
 	std::shared_ptr<vel_fd_3d> vel(new vel_fd_3d(io,"velocity"));
 	std::shared_ptr<image_rtm_3d> image(new image_rtm_3d(io,"image",vel));
 	SEP::axis asx=data->getAxis(4);
+        fprintf(stderr,"where id die\n"); 
 	SEP::axis asy=data->getAxis(5);
+        fprintf(stderr,"where id die\n"); 
 
 
 	wavelet->set_sources_axes(src_depth,asx,asy);
@@ -48,7 +47,7 @@ fprintf(stderr,"die1 \n");
 	std::shared_ptr<cpuProp> prop(new cpuProp(io));
 
 	std::shared_ptr<rtm_zero_op> op(new
-		rtm_zero_op(pars,prop,vel,wavelet,data,image,aper,true,encode,rand_vec,true));
+         rtm_zero_op(pars,prop,vel,wavelet,data,image,aper,true,encode,rand_vec,true));
 
    
 	op->forward(false,image,data,1);
