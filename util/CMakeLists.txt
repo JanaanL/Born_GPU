@@ -7,7 +7,7 @@ set(UTILS Wavelet Vel Data Add)
 
 foreach(util ${UTILS})
   ADD_EXECUTABLE(${util} ${util}.cc)
-  TARGET_LINK_LIBRARIES(${util} genericCpp)
+  TARGET_LINK_LIBRARIES(${util} genericCpp hypercube)
   foreach(lib ${GENERIC_EXPORT_LIBS})
     TARGET_LINK_LIBRARIES(${util} ${lib})
   endforeach(lib)
