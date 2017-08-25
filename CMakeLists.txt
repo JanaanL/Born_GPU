@@ -17,6 +17,9 @@ endif()
 enable_language(CXX)
 find_library(LIBTBB tbb REQUIRED)
 
+FIND_PACKAGE(hypercube NO_MODULE REQUIRED)
+INCLUDE_DIRECTORIES(${hypercube_DIRNAME_include})
+
 FIND_PACKAGE(genericIO NO_MODULE REQUIRED)
 INCLUDE_DIRECTORIES(${genericIO_DIRNAME_include})
 
@@ -30,8 +33,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 
 ADD_EXECUTABLE(RTM3D rtm.cc)
 ADD_EXECUTABLE(Model3D model.cc)
-TARGET_LINK_LIBRARIES(RTM3D base genericCpp ${LIBTBB})
-TARGET_LINK_LIBRARIES(Model3D base genericCpp ${LIBTBB})
+TARGET_LINK_LIBRARIES(RTM3D base genericCpp hypercube ${LIBTBB})
+TARGET_LINK_LIBRARIES(Model3D base genericCpp hypercube ${LIBTBB})
 
 
 add_subdirectory(util)
