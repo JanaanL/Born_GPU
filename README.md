@@ -7,24 +7,26 @@ You need to install two small libraries before installing Born.
 
 Install instructions
 
-RUN git clone http://zapad.Stanford.EDU/bob/hypercube.git   /opt/hypercube/src && \
-    mkdir /opt/hypercube/build && \
-    cd /opt/hypercube/build &&\
-    cmake -DCMAKE_INSTALL_PREFIX=/opt/hypercube ../src &&\
-    make install &&\
-    rm -rf /opt/hypercube/build
-RUN git clone http://zapad.Stanford.EDU/bob/genericIO.git /opt/genericIO/src && \
-    mkdir /opt/genericIO/build &&\
-    cd /opt/genericIO/build &&\
-    cmake  -Dhypercube_DIR=/opt/hypercube/lib  -DCMAKE_INSTALL_PREFIX=/opt/genericIO ../src &&\
-    make install && \
-    rm -rf /opt/genericIO/build
-RUN git clone http://zapad.Stanford.EDU/SEP-external/Born.git /opt/born/src && \
-  mkdir /opt/born/build && \
-  cd /opt/born/build &&  \
-    cmake  -Dhypercube_DIR=/opt/hypercube/lib -DgenericIO_DIR=/opt/genericIO/lib  -DCMAKE_INSTALL_PREFIX=/opt/genericIO ../src &&\
-    make install &&\
-    rm -rf /opt/born/build
+1. git clone http://zapad.Stanford.EDU/bob/hypercube.git   /opt/hypercube/src 
+1.mkdir /opt/hypercube/build 
+1.  cd /opt/hypercube/build 
+1.    cmake -DCMAKE_INSTALL_PREFIX=/opt/hypercube ../src 
+1.    make install 
+1.    rm -rf /opt/hypercube/build
+
+1. git clone http://zapad.Stanford.EDU/bob/genericIO.git /opt/genericIO/src 
+1. mkdir /opt/genericIO/build
+1. cd /opt/genericIO/build
+1. cmake  -Dhypercube_DIR=/opt/hypercube/lib  -DCMAKE_INSTALL_PREFIX=/opt/genericIO ../src
+1. make install 
+1. rm -rf /opt/genericIO/build
+
+3. git clone http://zapad.Stanford.EDU/SEP-external/Born.git /opt/born/src 
+  1. mkdir /opt/born/build 
+  2. cd /opt/born/build 
+  3. cmake  -Dhypercube_DIR=/opt/hypercube/lib -DgenericIO_DIR=/opt/genericIO/lib  -DCMAKE_INSTALL_PREFIX=/opt/genericIO ../src 
+  4. make install 
+  5. rm -rf /opt/born/build
 
 
 
