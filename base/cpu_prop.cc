@@ -139,8 +139,8 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	if(nt%2==1){
 	   float *x=new float[_n123];
 	   memcpy(x,p0,sizeof(float)*_n123);
-	   memcpy(p1,p0,sizeof(float)*_n123);
-	   memcpy(p0,x,sizeof(float)*_n123); 
+	   memcpy(p0,p1,sizeof(float)*_n123);
+	   memcpy(p1,x,sizeof(float)*_n123); 
 	}
 
 }
