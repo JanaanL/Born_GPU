@@ -1,13 +1,22 @@
 From centos:7
 MAINTAINER Bob Clapp <bob@sep.stanford.edu>
-RUN yum -y install tbb-devel gcc gcc-c++ make git cmake && \
+RUN yum -y install boost-devel boost-filesystem  epel-release install tbb-devel gcc gcc-c++ make git cmake && \
    yum -y clean all
+RUN yum -y install cmake3 &&\
+  yum -y clean all
 RUN git clone http://zapad.Stanford.EDU/bob/hypercube.git   /opt/hypercube/src && \
     mkdir /opt/hypercube/build && \
     cd /opt/hypercube/build &&\
     cmake -DCMAKE_INSTALL_PREFIX=/opt/hypercube ../src &&\
     make install &&\
     rm -rf /opt/hypercube/build
+RUN git clone https://github.com/LLNL/zfp /opt/zfp/src &&\
+ mkdir -p /opt/zfp/build  &&\
+  cd /opt/zfp/build  && \
+ cmake3 -DCMAKE_INSTALL_PREFIX=/opt/zfp  ../src  && \
+   make &&\
+ make install
+ENV ZFP_BASE /opt/zfp
 RUN git clone http://zapad.Stanford.EDU/bob/genericIO.git /opt/genericIO/src && \
     mkdir /opt/genericIO/build &&\
     cd /opt/genericIO/build &&\
