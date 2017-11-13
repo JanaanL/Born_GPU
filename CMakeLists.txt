@@ -5,7 +5,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Ofast")
+ # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Ofast")
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3")
+
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -16,6 +18,8 @@ endif()
 
 enable_language(CXX)
 find_library(LIBTBB tbb REQUIRED)
+
+FIND_PACKAGE(CUDA REQUIRED)
 
 FIND_PACKAGE(hypercube NO_MODULE REQUIRED)
 INCLUDE_DIRECTORIES(${hypercube_DIRNAME_include})
@@ -31,7 +35,7 @@ add_subdirectory(base)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 
-ADD_EXECUTABLE(RTM3D rtm.cc)
+CUDA_ADD_EXECUTABLE(RTM3D rtm.cc base/cpu_prop.cu)
 ADD_EXECUTABLE(Model3D model.cc)
 TARGET_LINK_LIBRARIES(RTM3D base genericCpp hypercube ${LIBTBB})
 TARGET_LINK_LIBRARIES(Model3D base genericCpp hypercube ${LIBTBB})

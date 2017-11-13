@@ -47,4 +47,5 @@ float _bcA,_bcB,_bcY;   //Boundary condition
 std::vector<float>  coeffs,_bound;
 long long _n123;
 FILE *myf;
+int _sourceVSize;
 };
