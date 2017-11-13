@@ -7,6 +7,7 @@
 #include "image_rtm_3d.h"
 #include "fd_prop_3d.h"
 #include "source_func_3d.h"
+#include "cpu_prop.h"
 class rtm_zero_op : public my_operator, public fd_prop {
 public:
 rtm_zero_op(){

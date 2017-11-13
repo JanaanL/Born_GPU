@@ -4,7 +4,6 @@ class cpuProp : public baseProp {
 public:
 cpuProp(std::shared_ptr<SEP::genericIO> io);
 
-
 virtual void rtmForward(int n1, int n2, int n3, int jt, float *img,
 	float *rec, int npts, int nt, int nt_big, int rec_nx, int rec_my);
 virtual void rtmAdjoint(int n1, int n2, int n3, int jtd, float *p0, float *p1,

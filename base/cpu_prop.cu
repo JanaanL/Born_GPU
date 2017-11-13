@@ -184,12 +184,13 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	cudaMalloc((void **)&dev_coeffs, coeffs.size() * sizeof(float)); 
 	
 	//set up CUDA for prop functions
-	float *dev_tableS, *dev_sourceV, *dev_locsS;
+	float *dev_tableS, *dev_sourceV; 
+	int *dev_locsS;
 	int tableSize = _tableS.size();
 	cudaMalloc((void **)&dev_tableS, tableSize * sizeof(float)); 
 	
 	//Need to figure out size of vals??
-	cudaMalloc((void **)&dev_sourceV, _sourceVSize * sizeof(float));
+	cudaMalloc((void **)&dev_sourceV, nt*npts * sizeof(float));
 	cudaMalloc((void **)&dev_locsS, _locsS.size() * sizeof(int)); 
 	
 	cudaMemcpy(dev_p0, p0, n * sizeof(float), cudaMemcpyHostToDevice);
@@ -397,10 +398,11 @@ void cpuProp::transferSincTableD(int nsinc, int jtd, std::vector<std::vector<flo
 
 }
 void cpuProp::transferSourceFunc(int npts,int nt_big,std::vector<int> &locs,float *vals){
-	_nptsS=npts; _ntSrc=nt_big; _locsS=locs; _sourceV=vals;
-	_sourceVSize = vals.size();
+	_nptsS=npts; _ntSrc=nt_big; _locsS=locs;
 	
 }
+
+
 void cpuProp::transferVelFunc1(int nx, int ny, int nz, float *vloc){
 	_nx=nx; _ny=ny; _nz=nz; _vel1=vloc;
 }

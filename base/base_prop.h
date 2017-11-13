@@ -20,10 +20,12 @@ virtual void setNtblock(int nb){
 virtual void transferSincTableD(int nsinc, int jtd, std::vector<std::vector<float>>& table){
 	if(nsinc==0 && jtd==0 ) ;
 }
+
 virtual void transferSourceFunc(int npts,int nt_big,std::vector<int> &locs, 
 float * vals){
 	if(npts==0 && nt_big==0) ;
 }
+
 virtual void transferVelFunc1(int nx, int ny, int nz, float *vloc){
 	if(nx ==0 && ny==0 && nz==0 && vloc==0) ;
 
@@ -68,6 +70,7 @@ virtual void createSpace(float d1, float d2, float d3,float bc_a, float bc_b, fl
 
 }
 
+void getValSize(int size);
 private:
 std::shared_ptr<SEP::genericIO> _io;
 };

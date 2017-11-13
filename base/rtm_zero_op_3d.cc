@@ -69,6 +69,7 @@ void rtm_zero_op::create_source_fields(){
 		source->get_source_func(src_p0,ishot,nt_big,locs,vals);
 		_prop->transferSourceFunc(npts, nt_big, locs, vals.data());
 
+
 		if(verb) fprintf(stderr,"Forward 0propagating shot %d of %d \n",ishot,nshots);
 
 		seed=locs[3] - ((int) locs[3]/10000)*10000;
