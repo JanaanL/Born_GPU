@@ -36,7 +36,7 @@ add_subdirectory(base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 
 CUDA_ADD_EXECUTABLE(RTM3D rtm.cc base/cpu_prop.cu)
-ADD_EXECUTABLE(Model3D model.cc)
+CUDA_ADD_EXECUTABLE(Model3D model.cc base/cpu_prop.cu)
 TARGET_LINK_LIBRARIES(RTM3D base genericCpp hypercube ${LIBTBB})
 TARGET_LINK_LIBRARIES(Model3D base genericCpp hypercube ${LIBTBB})
 
