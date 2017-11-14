@@ -184,7 +184,8 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	_jt=jts;
 	int n12=_nx*_ny;
 	_dir=1;
-	
+
+	printf("Setting up CUDA for prop kernel\n");	
 	//set up CUDA for prop functions
 	float *dev_p0, *dev_p1, *dev_vel, *dev_coeffs;
 	int n = _nx * _ny * _nz;
@@ -195,6 +196,7 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	gpuErrchk(cudaMalloc((void **)&dev_coeffs, coeffs.size() * sizeof(float))); 
 	
 	//set up CUDA for prop functions
+	printf("Setting up CUDA for inject_source kernel\n");
 	float *dev_tableS, *dev_sourceV; 
 	int *dev_locsS;
 	int tableSize = _tableS.size();
@@ -204,24 +206,34 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	gpuErrchk(cudaMalloc((void **)&dev_sourceV, nt*npts * sizeof(float)));
 	gpuErrchk(cudaMalloc((void **)&dev_locsS, _locsS.size() * sizeof(int))); 
 	
+
+	printf("Doing the cudaMemcopy\n");
 	gpuErrchk(cudaMemcpy(dev_p0, p0, n * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copies p0\n");
 	gpuErrchk(cudaMemcpy(dev_p1, p1, n * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copied p1\n");
 	gpuErrchk(cudaMemcpy(dev_vel, _vel1, n * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copies vel1\n");
 	gpuErrchk(cudaMemcpy(dev_coeffs, coeffs.data(), coeffs.size() * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copies coeffs\n");
 	
 	gpuErrchk(cudaMemcpy(dev_tableS, _tableS.data(), tableSize * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copies tableS\n");
+	//printf("nt = %d and nts = %d\n", nt, nts);
 	gpuErrchk(cudaMemcpy(dev_sourceV, _sourceV, nt*npts * sizeof(float), cudaMemcpyHostToDevice));
+	printf("Just copies sourceV\n");
 	gpuErrchk(cudaMemcpy(dev_locsS, _locsS.data(), _locsS.size() * sizeof(int), cudaMemcpyHostToDevice));
+	printf("Just copies locS\n");
 	
 
+	printf("Creating the grid and block dimensions\n");
 	dim3 grid((BLOCKS + THREADS)/THREADS, (BLOCKS + THREADS)/THREADS);
 	dim3 block(THREADS, THREADS);
 
 	dim3 grid1(1,1);
 	dim3 block1(3,3);
 
-	for(int it=0; it<=nt; it++) {
-		std::cout<<"The time step is" << it <<std::endl;
+	for(int it=0; it<=nt; it++) {		
 		int id=it/_jtsS;
 		int ii=it-id*_jtsS;
 
