@@ -3,6 +3,7 @@
 #include <tbb/parallel_reduce.h>
 #include <tbb/parallel_for.h>
 #include "cpu_prop.h"
+
 #define C0  0
 #define CZ1 1
 #define CX1 2
@@ -17,9 +18,18 @@
 #define CX4 11
 #define CY4 12
 
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
+
 #define BLOCKS 8 // 8 x 8 blocks per grid
 #define THREADS 32 // 32 x 32 threads per block
-
 cpuProp::cpuProp(std::shared_ptr<SEP::genericIO> io){
 	storeIO(io);
 }
@@ -124,6 +134,7 @@ void cpuProp::imageCondition(float *rec, float *src, float *img){
 
 __global__ void prop_gpu(float *p0, float *p1, float *vel, float *coeffs, int _nx, int _ny, int _nz, int _n12){ 
 
+	printf("At the gpu kernel\n");
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 	int ii  = row * _nx + col;
@@ -177,30 +188,30 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	//set up CUDA for prop functions
 	float *dev_p0, *dev_p1, *dev_vel, *dev_coeffs;
 	int n = _nx * _ny * _nz;
-	cudaMalloc((void **)&dev_p0, n * sizeof(float));
-	cudaMalloc((void **)&dev_p1, n * sizeof(float)); 
-	cudaMalloc((void **)&dev_vel, n * sizeof(float));
+	gpuErrchk(cudaMalloc((void **)&dev_p0, n * sizeof(float)));
+	gpuErrchk(cudaMalloc((void **)&dev_p1, n * sizeof(float))); 
+	gpuErrchk(cudaMalloc((void **)&dev_vel, n * sizeof(float)));
 	 
-	cudaMalloc((void **)&dev_coeffs, coeffs.size() * sizeof(float)); 
+	gpuErrchk(cudaMalloc((void **)&dev_coeffs, coeffs.size() * sizeof(float))); 
 	
 	//set up CUDA for prop functions
 	float *dev_tableS, *dev_sourceV; 
 	int *dev_locsS;
 	int tableSize = _tableS.size();
-	cudaMalloc((void **)&dev_tableS, tableSize * sizeof(float)); 
+	gpuErrchk(cudaMalloc((void **)&dev_tableS, tableSize * sizeof(float))); 
 	
 	//Need to figure out size of vals??
-	cudaMalloc((void **)&dev_sourceV, nt*npts * sizeof(float));
-	cudaMalloc((void **)&dev_locsS, _locsS.size() * sizeof(int)); 
+	gpuErrchk(cudaMalloc((void **)&dev_sourceV, nt*npts * sizeof(float)));
+	gpuErrchk(cudaMalloc((void **)&dev_locsS, _locsS.size() * sizeof(int))); 
 	
-	cudaMemcpy(dev_p0, p0, n * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_p1, p1, n * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_vel, _vel1, n * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_coeffs, coeffs.data(), coeffs.size() * sizeof(float), cudaMemcpyHostToDevice);
+	gpuErrchk(cudaMemcpy(dev_p0, p0, n * sizeof(float), cudaMemcpyHostToDevice));
+	gpuErrchk(cudaMemcpy(dev_p1, p1, n * sizeof(float), cudaMemcpyHostToDevice));
+	gpuErrchk(cudaMemcpy(dev_vel, _vel1, n * sizeof(float), cudaMemcpyHostToDevice));
+	gpuErrchk(cudaMemcpy(dev_coeffs, coeffs.data(), coeffs.size() * sizeof(float), cudaMemcpyHostToDevice));
 	
-	cudaMemcpy(dev_tableS, _tableS.data(), tableSize * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_sourceV, _sourceV, _sourceVSize * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_locsS, _locsS.data(), _locsS.size() * sizeof(int), cudaMemcpyHostToDevice);
+	gpuErrchk(cudaMemcpy(dev_tableS, _tableS.data(), tableSize * sizeof(float), cudaMemcpyHostToDevice));
+	gpuErrchk(cudaMemcpy(dev_sourceV, _sourceV, nt*npts * sizeof(float), cudaMemcpyHostToDevice));
+	gpuErrchk(cudaMemcpy(dev_locsS, _locsS.data(), _locsS.size() * sizeof(int), cudaMemcpyHostToDevice));
 	
 
 	dim3 grid((BLOCKS + THREADS)/THREADS, (BLOCKS + THREADS)/THREADS);
@@ -210,10 +221,12 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 	dim3 block1(3,3);
 
 	for(int it=0; it<=nt; it++) {
+		std::cout<<"The time step is" << it <<std::endl;
 		int id=it/_jtsS;
 		int ii=it-id*_jtsS;
 
 		prop_gpu<<<grid, block>>>(dev_p0, dev_p1, dev_vel, dev_coeffs, _nx, _ny, _nz, _n12);
+		gpuErrchk( cudaPeekAtLastError() );
 		cudaDeviceSynchronize();
 		inject_Source<<<grid1, block1>>>(id, ii, dev_p0, dev_tableS, dev_sourceV, dev_locsS, _dir, _jt, _ntSrc);
 		cudaDeviceSynchronize();
@@ -225,6 +238,7 @@ void cpuProp::sourceProp(int nx, int ny, int nz, bool damp, bool getLast,
 
 	//copy data back to host and clean up
 	cudaMemcpy(p0, dev_p0, n * sizeof(float), cudaMemcpyDeviceToHost);
+	cudaMemcpy(p1, dev_p1, n * sizeof(float), cudaMemcpyDeviceToHost);
 	cudaFree(dev_p0);
 	cudaFree(dev_p1);
 	cudaFree(dev_vel);
